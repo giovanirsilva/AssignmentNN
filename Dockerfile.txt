@@ -1,0 +1,79 @@
+FROM python:3.8-alpine3.12
+
+MAINTAINER Giovani Silva <giovani.silva@outlook.com>
+LABEL description NN Robot Framework in Docker.
+
+# Set the reports directory environment variable
+ENV ROBOT_REPORTS_DIR /opt/robotframework/reports
+
+# Set the tests directory environment variable
+ENV ROBOT_TESTS_DIR /opt/robotframework/tests
+
+# Set the working directory environment variable
+ENV ROBOT_WORK_DIR /opt/robotframework/temp
+
+# Set number of threads for parallel execution
+# By default, no parallelisation
+ENV ROBOT_THREADS 1
+
+# Define the default user who'll run the tests
+ENV ROBOT_UID 1000
+ENV ROBOT_GID 1000
+
+# Dependency versions
+ENV DATABASE_LIBRARY_VERSION 1.2
+ENV FTP_LIBRARY_VERSION 1.9
+ENV GECKO_DRIVER_VERSION v0.26.0
+ENV REQUESTS_VERSION 0.7.0
+ENV ROBOT_FRAMEWORK_VERSION 3.2
+ENV SSH_LIBRARY_VERSION 3.4.0
+ENV XVFB_VERSION 1.20
+
+COPY bin/run.sh /opt/robotframework/bin/
+
+# Install system dependencies
+RUN apk update \
+  && apk --no-cache upgrade \
+  && apk --no-cache --virtual .build-deps add \
+    gcc \
+    libffi-dev \
+    linux-headers \
+    make \
+    musl-dev \
+    openssl-dev \
+    which \
+    wget \
+  
+
+# Installing Robot Framework and Selenium Library
+  && pip3 install \
+    --no-cache-dir \
+    robotframework==$ROBOT_FRAMEWORK_VERSION \
+    robotframework-databaselibrary==$DATABASE_LIBRARY_VERSION \
+    robotframework-ftplibrary==$FTP_LIBRARY_VERSION \
+    robotframework-requests==$REQUESTS_VERSION \
+    robotframework-sshlibrary==$SSH_LIBRARY_VERSION \
+    PyYAML \
+
+
+# Default report
+RUN mkdir -p ${ROBOT_REPORTS_DIR} \
+  && mkdir -p ${ROBOT_WORK_DIR} \
+  && chown ${ROBOT_UID}:${ROBOT_GID} ${ROBOT_REPORTS_DIR} \
+  && chown ${ROBOT_UID}:${ROBOT_GID} ${ROBOT_WORK_DIR} \
+  && chmod ugo+w ${ROBOT_REPORTS_DIR} ${ROBOT_WORK_DIR}
+
+# Logs
+RUN chmod ugo+w /var/log \
+  && chown ${ROBOT_UID}:${ROBOT_GID} /var/log
+
+# Update system path
+ENV PATH=/opt/robotframework/bin:/opt/robotframework/drivers:$PATH
+
+# Set up a volume for the generated reports
+VOLUME ${ROBOT_REPORTS_DIR}
+
+USER ${ROBOT_UID}:${ROBOT_GID}
+
+# Execute all robot tests
+CMD ["run.sh"]
