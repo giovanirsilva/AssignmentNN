@@ -19,14 +19,14 @@
 	The test cases should at least cover these basic behavior
 
 	Test Cases Output Expected: 
-				GET - Check with admin , john , unknown .   Should return 200 or 403 for unknown
+			    GET - Check with admin , john , unknown .   Should return 200 or 403 for unknown
 			    PUT - Check with admin , john , unknown . 
-					   Check inserting currency with different size than 3	
-				POST - Check permition only for admin
-					   Check convertion of each currency (expected to see completed 1 )
-					   Check if no convertion needed (expected to see completed 0 )
-				DELETE - Check permition admin/user
-						 Delete a payment and check that it was deleted as expected - Done
+			          Check inserting currency with different size than 3	
+			    POST - Check permition only for admin
+			          Check convertion of each currency (expected to see completed 1 )
+				  Check if no convertion needed (expected to see completed 0 )
+			    DELETE - Check permition admin/user
+				  Delete a payment and check that it was deleted as expected - Done
 						
 						 
 	Test Plan Manual for basic flow:
@@ -57,6 +57,7 @@
    _Note_: after each test consider to return the test target (app, data) into the same state. -> Done (Test Teardown   Restore Database)
 
 4. Execute test cases locally from RIDE (https://github.com/robotframework/RIDE) and from a docker container. -> See the DockerFile
+
 	-> You can execute manually as well the test cases using the following command in the folder (NN\test_cases):  robot -d result *.robot
 	-> Libraries necessary: Collections, RequestsLibrary, RequestsChecker, json requests and Process (Can be installed manually using  pip install robotframework-%libraryname%
 
@@ -66,9 +67,13 @@
 ->	The following defects were found executing the automation and doing manual test and should be fixed for the correct behavior of the app regarding the design documentation:
 	
 ->	BUG: Country code is not being limited by 3 digits ( expected 400 status code Bad Request regarding rfc 4918.) - Priority Medium
+
 ->	BUG: Common user should not be able to delete any payment - Priority High
+
 ->	BUG: Common user should not be able to POST(process) payment - Priority High 
+
 ->	BUG: USD currency not being processed  - Priority Highest
+
 ->	BUG: Currency convertion not doing the right calculation- Convertion for GBP is using 0.84 but it should use 0.89 - Priority Highest
 	
 	Note that when executing the automation we have as result 8 critical test, 4 passed, 4 failed .  4 failed tests were the tests that I analised why failed
@@ -77,7 +82,7 @@
 6. The application uses SQLite database, but what will change in your code if it gets replaced with MySQL or MS SQL or Oracle?
 
 ->	If the database changed to MySql or Oracle for example I would have to pay more attention to the rest request methods since this database has better authentication compared to SQLite. So I would perform the rest calls after passing a specific authentication
-     The calls and connection to the database would be different and I would use another robot library
+        The calls and connection to the database would be different and I would use another robot library
 
 7. What would you improve in your approach and code if you have more time?
 
